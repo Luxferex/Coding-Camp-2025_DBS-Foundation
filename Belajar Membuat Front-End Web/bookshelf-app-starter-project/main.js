@@ -4,7 +4,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const incompleteBookList = document.getElementById('incompleteBookList');
   const completeBookList = document.getElementById('completeBookList');
 
-  let books = JSON.parse(localStorage.getItem('books')) || [];
+  let books = (JSON.parse(localStorage.getItem('books')) || []).map((book) => ({
+    ...book,
+    year: Number(book.year),
+  }));
 
   function saveBooks() {
     localStorage.setItem('books', JSON.stringify(books));
@@ -76,10 +79,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const title = document.getElementById('bookFormTitle').value.trim();
     const author = document.getElementById('bookFormAuthor').value.trim();
-    const year = document.getElementById('bookFormYear').value.trim();
+    const yearInput = document.getElementById('bookFormYear').value.trim();
     const isComplete = document.getElementById('bookFormIsComplete').checked;
 
-    if (title === '' || author === '' || year === '') return alert('Lengkapi semua data buku!');
+    const year = Number(yearInput);
+
+    if (title === '' || author === '' || isNaN(year) || year === 0) {
+      return alert('Lengkapi semua data buku dengan benar!');
+    }
 
     const newBook = {
       id: +new Date(),
