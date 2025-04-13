@@ -39,54 +39,43 @@ function main() {
   };
 
   const updateBook = (book) => {
-    // Membuat instance dari XMLHttpRequest
-    const xhr = new XMLHttpRequest();
-
-    // Menetapkan callback jika response sukses dan error
-    xhr.onload = function () {
-      const responseJson = JSON.parse(this.responseText);
-      showResponseMessage(responseJson.message);
-      getBook();
-    };
-
-    xhr.onerror = function () {
-      showResponseMessage();
-    };
-
-    // Membuat PUT request dan menetapkan target URL
-    xhr.open('PUT', `${baseUrl}/edit/${book.id}`);
-
-    // Menetapkan properti Content-Type dan X-Auth-Token pada Header request
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('X-Auth-Token', '12345');
-
-    // Mengirimkan request dan menyisipkan JSON.stringify(book) pada body
-    xhr.send(JSON.stringify(book));
+    fetch(`${baseUrl}/edit/${book.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Auth-Token': '12345',
+      },
+      body: JSON.stringify(book),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((responseJson) => {
+        showResponseMessage(responseJson.message);
+        getBook();
+      })
+      .catch((error) => {
+        showResponseMessage(error);
+      });
   };
 
   const removeBook = (bookId) => {
-    // Membuat instance dari XMLHttpRequest
-    const xhr = new XMLHttpRequest();
-
-    //menetapkan callback jika response sukses dan error
-    xhr.onload = function () {
-      const responseJson = JSON.parse(this.responseText);
-      showResponseMessage(responseJson.message);
-      getBook();
-    };
-
-    xhr.onerror = function () {
-      showResponseMessage();
-    };
-
-    // Membuat DELETE request dan menetapkan target URL
-    xhr.open('DELETE', `${baseUrl}/delete/${bookId}`);
-
-    // Menetapkan properti Content-Type dan X-Auth-Token pada Header request
-    xhr.setRequestHeader('X-Auth-Token', '12345');
-
-    // Mengirimkan request
-    xhr.send();
+    fetch(`${baseUrl}/delete/${bookId}`, {
+      method: 'DELETE',
+      headers: {
+        'X-Auth-Token': '12345',
+      },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((responseJson) => {
+        showResponseMessage(responseJson.message);
+        getBook();
+      })
+      .catch((error) => {
+        showResponseMessage(error);
+      });
   };
 
   /*
