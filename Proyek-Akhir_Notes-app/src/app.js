@@ -17,18 +17,31 @@ class NoteItem extends HTMLElement {
           border-radius: 5px;
           background: #fff;
         }
+        .archived {
+          background: #f0f0f0;
+        }
       </style>
-      <div class="note">
+      <div class="note ${note.archived ? 'archived' : ''}">
         <h3>${note.title}</h3>
         <p>${note.body}</p>
         <small>${new Date(note.createdAt).toLocaleDateString()}</small>
         <button class="delete-button">Hapus</button>
+        ${note.archived ? `<button class="unarchive-button">Kembalikan Arsip</button>` : `<button class="archive-button">Arsipkan</button>`}
       </div>
     `;
 
     // Menangani penghapusan catatan
     this.shadowRoot.querySelector('.delete-button').addEventListener('click', () => {
       this.dispatchEvent(new CustomEvent('note-deleted', { detail: note.id, bubbles: true, composed: true }));
+    });
+
+    // Menangani pengarsipan atau pengembalian arsip
+    this.shadowRoot.querySelector('.archive-button')?.addEventListener('click', () => {
+      this.dispatchEvent(new CustomEvent('note-archived', { detail: note.id, bubbles: true, composed: true }));
+    });
+
+    this.shadowRoot.querySelector('.unarchive-button')?.addEventListener('click', () => {
+      this.dispatchEvent(new CustomEvent('note-unarchived', { detail: note.id, bubbles: true, composed: true }));
     });
   }
 }
@@ -156,6 +169,32 @@ class NoteForm extends HTMLElement {
 }
 customElements.define('note-form', NoteForm);
 
+// Fungsi untuk mengarsipkan catatan
+const archiveNote = async (noteId) => {
+  const response = await fetch(`https://notes-api.dicoding.dev/v2/notes/${noteId}/archive`, {
+    method: 'POST',
+  });
+
+  const data = await response.json();
+  if (data.status === 'success') {
+    return true;
+  }
+  return false;
+};
+
+// Fungsi untuk mengembalikan catatan dari arsip (unarchive)
+const unarchiveNote = async (noteId) => {
+  const response = await fetch(`https://notes-api.dicoding.dev/v2/notes/${noteId}/unarchive`, {
+    method: 'POST',
+  });
+
+  const data = await response.json();
+  if (data.status === 'success') {
+    return true;
+  }
+  return false;
+};
+
 // Fungsi untuk menghapus catatan
 const deleteNote = async (noteId) => {
   const response = await fetch(`https://notes-api.dicoding.dev/v2/notes/${noteId}`, {
@@ -169,7 +208,7 @@ const deleteNote = async (noteId) => {
   return false;
 };
 
-// mengambil catatan dari API
+// Fungsi untuk mengambil catatan dari API
 const getNotes = async () => {
   const loadingIndicator = document.createElement('loading-indicator');
   document.body.appendChild(loadingIndicator);
@@ -181,13 +220,6 @@ const getNotes = async () => {
   return data.data; // Mengembalikan catatan yang belum diarsipkan
 };
 
-// mengambil catatan perorangan
-const getSingleNote = async (noteId) => {
-  const response = await fetch(`https://notes-api.dicoding.dev/v2/notes/${noteId}`);
-  const data = await response.json();
-  return data.data; // Mengembalikan detail catatan tertentu
-};
-
 // Render aplikasi
 document.addEventListener('DOMContentLoaded', async () => {
   const notesList = document.querySelector('notes-list');
@@ -195,8 +227,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Ambil data catatan dari API
   let notes = await getNotes();
-  notesList.notes = notes;
+  notesList.notes = notes; // Set initial notes
 
+  // Event listener ketika catatan baru ditambahkan
   noteForm.addEventListener('note-added', (event) => {
     notes = [...notes, event.detail];
     notesList.notes = notes;
@@ -204,13 +237,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Event listener untuk penghapusan catatan
   notesList.addEventListener('note-deleted', async (event) => {
-    if (!Array.isArray(notesList.notes)) {
-      notesList.notes = [];
-    }
-
     const isDeleted = await deleteNote(event.detail);
     if (isDeleted) {
       notes = notes.filter((note) => note.id !== event.detail);
+      notesList.notes = notes;
+    }
+  });
+
+  // Event listener untuk pengarsipan catatan
+  notesList.addEventListener('note-archived', async (event) => {
+    const isArchived = await archiveNote(event.detail);
+    if (isArchived) {
+      notes = notes.map((note) => (note.id === event.detail ? { ...note, archived: true } : note));
+      notesList.notes = notes;
+    }
+  });
+
+  // Event listener untuk mengembalikan catatan dari arsip
+  notesList.addEventListener('note-unarchived', async (event) => {
+    const isUnarchived = await unarchiveNote(event.detail);
+    if (isUnarchived) {
+      notes = notes.map((note) => (note.id === event.detail ? { ...note, archived: false } : note));
       notesList.notes = notes;
     }
   });
