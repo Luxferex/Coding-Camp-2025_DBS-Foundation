@@ -31,18 +31,42 @@ class NoteItem extends HTMLElement {
     `;
 
     // Menangani penghapusan catatan
-    this.shadowRoot.querySelector('.delete-button').addEventListener('click', () => {
-      this.dispatchEvent(new CustomEvent('note-deleted', { detail: note.id, bubbles: true, composed: true }));
-    });
+    this.shadowRoot
+      .querySelector('.delete-button')
+      .addEventListener('click', () => {
+        this.dispatchEvent(
+          new CustomEvent('note-deleted', {
+            detail: note.id,
+            bubbles: true,
+            composed: true,
+          })
+        );
+      });
 
     // Menangani pengarsipan atau pengembalian arsip
-    this.shadowRoot.querySelector('.archive-button')?.addEventListener('click', () => {
-      this.dispatchEvent(new CustomEvent('note-archived', { detail: note.id, bubbles: true, composed: true }));
-    });
+    this.shadowRoot
+      .querySelector('.archive-button')
+      ?.addEventListener('click', () => {
+        this.dispatchEvent(
+          new CustomEvent('note-archived', {
+            detail: note.id,
+            bubbles: true,
+            composed: true,
+          })
+        );
+      });
 
-    this.shadowRoot.querySelector('.unarchive-button')?.addEventListener('click', () => {
-      this.dispatchEvent(new CustomEvent('note-unarchived', { detail: note.id, bubbles: true, composed: true }));
-    });
+    this.shadowRoot
+      .querySelector('.unarchive-button')
+      ?.addEventListener('click', () => {
+        this.dispatchEvent(
+          new CustomEvent('note-unarchived', {
+            detail: note.id,
+            bubbles: true,
+            composed: true,
+          })
+        );
+      });
   }
 }
 customElements.define('note-item', NoteItem);
@@ -147,23 +171,39 @@ class NoteForm extends HTMLElement {
       const loadingIndicator = document.createElement('loading-indicator');
       document.body.appendChild(loadingIndicator);
 
-      // Kirim catatan baru ke API
-      const response = await fetch('https://notes-api.dicoding.dev/v2/notes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newNote),
-      });
+      try {
+        // Kirim catatan baru ke API
+        const response = await fetch(
+          'https://notes-api.dicoding.dev/v2/notes',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newNote),
+          }
+        );
 
-      const data = await response.json();
-      if (data.status === 'success') {
-        this.dispatchEvent(new CustomEvent('note-added', { detail: data.data, bubbles: true, composed: true }));
+        if (!response.ok) {
+          throw new Error('Gagal menambahkan catatan');
+        }
+
+        const data = await response.json();
+        if (data.status === 'success') {
+          this.dispatchEvent(
+            new CustomEvent('note-added', {
+              detail: data.data,
+              bubbles: true,
+              composed: true,
+            })
+          );
+        }
+      } catch (error) {
+        alert(`Terjadi kesalahan: ${error.message}`);
+      } finally {
+        // Hapus indikator loading setelah request selesai
+        document.body.removeChild(loadingIndicator);
+        form.reset();
+        validateForm();
       }
-
-      // Hapus indikator loading setelah request selesai
-      document.body.removeChild(loadingIndicator);
-
-      form.reset();
-      validateForm();
     });
   }
 }
@@ -171,41 +211,62 @@ customElements.define('note-form', NoteForm);
 
 // Fungsi untuk mengarsipkan catatan
 const archiveNote = async (noteId) => {
-  const response = await fetch(`https://notes-api.dicoding.dev/v2/notes/${noteId}/archive`, {
-    method: 'POST',
-  });
-
-  const data = await response.json();
-  if (data.status === 'success') {
-    return true;
+  try {
+    const response = await fetch(
+      `https://notes-api.dicoding.dev/v2/notes/${noteId}/archive`,
+      {
+        method: 'POST',
+      }
+    );
+    if (!response.ok) {
+      throw new Error('Gagal mengarsipkan catatan');
+    }
+    const data = await response.json();
+    return data.status === 'success';
+  } catch (error) {
+    alert(`Terjadi kesalahan: ${error.message}`);
+    return false;
   }
-  return false;
 };
 
 // Fungsi untuk mengembalikan catatan dari arsip (unarchive)
 const unarchiveNote = async (noteId) => {
-  const response = await fetch(`https://notes-api.dicoding.dev/v2/notes/${noteId}/unarchive`, {
-    method: 'POST',
-  });
-
-  const data = await response.json();
-  if (data.status === 'success') {
-    return true;
+  try {
+    const response = await fetch(
+      `https://notes-api.dicoding.dev/v2/notes/${noteId}/unarchive`,
+      {
+        method: 'POST',
+      }
+    );
+    if (!response.ok) {
+      throw new Error('Gagal mengembalikan arsip catatan');
+    }
+    const data = await response.json();
+    return data.status === 'success';
+  } catch (error) {
+    alert(`Terjadi kesalahan: ${error.message}`);
+    return false;
   }
-  return false;
 };
 
 // Fungsi untuk menghapus catatan
 const deleteNote = async (noteId) => {
-  const response = await fetch(`https://notes-api.dicoding.dev/v2/notes/${noteId}`, {
-    method: 'DELETE',
-  });
-
-  const data = await response.json();
-  if (data.status === 'success') {
-    return true;
+  try {
+    const response = await fetch(
+      `https://notes-api.dicoding.dev/v2/notes/${noteId}`,
+      {
+        method: 'DELETE',
+      }
+    );
+    if (!response.ok) {
+      throw new Error('Gagal menghapus catatan');
+    }
+    const data = await response.json();
+    return data.status === 'success';
+  } catch (error) {
+    alert(`Terjadi kesalahan: ${error.message}`);
+    return false;
   }
-  return false;
 };
 
 // Fungsi untuk mengambil catatan dari API
@@ -213,11 +274,19 @@ const getNotes = async () => {
   const loadingIndicator = document.createElement('loading-indicator');
   document.body.appendChild(loadingIndicator);
 
-  const response = await fetch('https://notes-api.dicoding.dev/v2/notes');
-  const data = await response.json();
-  document.body.removeChild(loadingIndicator);
-
-  return data.data; // Mengembalikan catatan yang belum diarsipkan
+  try {
+    const response = await fetch('https://notes-api.dicoding.dev/v2/notes');
+    if (!response.ok) {
+      throw new Error('Gagal memuat catatan');
+    }
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    alert(`Terjadi kesalahan: ${error.message}`);
+    return []; // Mengembalikan array kosong jika terjadi error
+  } finally {
+    document.body.removeChild(loadingIndicator);
+  }
 };
 
 // Render aplikasi
@@ -248,7 +317,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   notesList.addEventListener('note-archived', async (event) => {
     const isArchived = await archiveNote(event.detail);
     if (isArchived) {
-      notes = notes.map((note) => (note.id === event.detail ? { ...note, archived: true } : note));
+      notes = notes.map((note) =>
+        note.id === event.detail ? { ...note, archived: true } : note
+      );
       notesList.notes = notes;
     }
   });
@@ -257,7 +328,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   notesList.addEventListener('note-unarchived', async (event) => {
     const isUnarchived = await unarchiveNote(event.detail);
     if (isUnarchived) {
-      notes = notes.map((note) => (note.id === event.detail ? { ...note, archived: false } : note));
+      notes = notes.map((note) =>
+        note.id === event.detail ? { ...note, archived: false } : note
+      );
       notesList.notes = notes;
     }
   });
