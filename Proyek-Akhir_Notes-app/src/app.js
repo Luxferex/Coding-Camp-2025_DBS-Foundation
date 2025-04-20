@@ -1,3 +1,5 @@
+import './style.css';
+
 // Custom Element Item Catatan
 class NoteItem extends HTMLElement {
   constructor() {
@@ -128,7 +130,7 @@ class NoteForm extends HTMLElement {
       const body = bodyInput.value;
       const newNote = { title, body };
 
-      // send note
+      // Kirim catatan baru ke API
       const response = await fetch('https://notes-api.dicoding.dev/v2/notes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -147,14 +149,14 @@ class NoteForm extends HTMLElement {
 }
 customElements.define('note-form', NoteForm);
 
-// get note
+// mengambil catatan dari API
 const getNotes = async () => {
   const response = await fetch('https://notes-api.dicoding.dev/v2/notes');
   const data = await response.json();
   return data.data;
 };
 
-// hapus note
+// menghapus catatan melalui API
 const deleteNote = async (noteId) => {
   const response = await fetch(`https://notes-api.dicoding.dev/v2/notes/${noteId}`, {
     method: 'DELETE',
@@ -167,19 +169,21 @@ const deleteNote = async (noteId) => {
   return false;
 };
 
-// Render Aplikasi
+// Render aplikasi
 document.addEventListener('DOMContentLoaded', async () => {
   const notesList = document.querySelector('notes-list');
   const noteForm = document.querySelector('note-form');
 
-  // Ambil data catatan
+  // Ambil data catatan dari API
   const notes = await getNotes();
   notesList.notes = notes;
 
+  // Event listener ketika catatan baru ditambahkan
   noteForm.addEventListener('note-added', (event) => {
     notesList.notes = [...notes, event.detail];
   });
 
+  // Event listener untuk penghapusan catatan
   notesList.addEventListener('note-deleted', async (event) => {
     const isDeleted = await deleteNote(event.detail);
     if (isDeleted) {
