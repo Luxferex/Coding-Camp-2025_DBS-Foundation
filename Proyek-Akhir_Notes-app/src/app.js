@@ -130,6 +130,10 @@ class NoteForm extends HTMLElement {
       const body = bodyInput.value;
       const newNote = { title, body };
 
+      // Tampilkan indikator loading sebelum request
+      const loadingIndicator = document.createElement('loading-indicator');
+      document.body.appendChild(loadingIndicator);
+
       // Kirim catatan baru ke API
       const response = await fetch('https://notes-api.dicoding.dev/v2/notes', {
         method: 'POST',
@@ -142,6 +146,9 @@ class NoteForm extends HTMLElement {
         this.dispatchEvent(new CustomEvent('note-added', { detail: data.data, bubbles: true, composed: true }));
       }
 
+      // Hapus indikator loading setelah request selesai
+      document.body.removeChild(loadingIndicator);
+
       form.reset();
       validateForm();
     });
@@ -149,14 +156,7 @@ class NoteForm extends HTMLElement {
 }
 customElements.define('note-form', NoteForm);
 
-// mengambil catatan dari API
-const getNotes = async () => {
-  const response = await fetch('https://notes-api.dicoding.dev/v2/notes');
-  const data = await response.json();
-  return data.data;
-};
-
-// menghapus catatan melalui API
+// Fungsi untuk menghapus catatan
 const deleteNote = async (noteId) => {
   const response = await fetch(`https://notes-api.dicoding.dev/v2/notes/${noteId}`, {
     method: 'DELETE',
@@ -169,25 +169,49 @@ const deleteNote = async (noteId) => {
   return false;
 };
 
+// mengambil catatan dari API
+const getNotes = async () => {
+  const loadingIndicator = document.createElement('loading-indicator');
+  document.body.appendChild(loadingIndicator);
+
+  const response = await fetch('https://notes-api.dicoding.dev/v2/notes');
+  const data = await response.json();
+  document.body.removeChild(loadingIndicator);
+
+  return data.data; // Mengembalikan catatan yang belum diarsipkan
+};
+
+// mengambil catatan perorangan
+const getSingleNote = async (noteId) => {
+  const response = await fetch(`https://notes-api.dicoding.dev/v2/notes/${noteId}`);
+  const data = await response.json();
+  return data.data; // Mengembalikan detail catatan tertentu
+};
+
 // Render aplikasi
 document.addEventListener('DOMContentLoaded', async () => {
   const notesList = document.querySelector('notes-list');
   const noteForm = document.querySelector('note-form');
 
   // Ambil data catatan dari API
-  const notes = await getNotes();
+  let notes = await getNotes();
   notesList.notes = notes;
 
-  // Event listener ketika catatan baru ditambahkan
   noteForm.addEventListener('note-added', (event) => {
-    notesList.notes = [...notes, event.detail];
+    notes = [...notes, event.detail];
+    notesList.notes = notes;
   });
 
   // Event listener untuk penghapusan catatan
   notesList.addEventListener('note-deleted', async (event) => {
+    if (!Array.isArray(notesList.notes)) {
+      notesList.notes = [];
+    }
+
     const isDeleted = await deleteNote(event.detail);
     if (isDeleted) {
-      notesList.notes = notesList.notes.filter((note) => note.id !== event.detail);
+      notes = notes.filter((note) => note.id !== event.detail);
+      notesList.notes = notes;
     }
   });
 });
