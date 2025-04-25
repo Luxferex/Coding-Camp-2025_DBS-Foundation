@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tugas Membangun Notes App</title>
+    <title>Aplikasi Catatan - FC012D5Y1191</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
@@ -11,8 +11,15 @@
       <h1>Aplikasi Catatan - FC012D5Y1191</h1>
     </header>
     <main>
+      <!-- Form untuk menambah catatan -->
       <note-form></note-form>
-      <notes-list></notes-list>
+
+      <!-- Daftar Catatan Aktif dan Arsip -->
+      <h2>Catatan Aktif</h2>
+      <notes-list id="active-notes-list"></notes-list>
+
+      <h2>Catatan Arsip</h2>
+      <notes-list id="archived-notes-list"></notes-list>
     </main>
     <script src="./app.js"></script>
   </body>
