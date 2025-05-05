@@ -36,7 +36,15 @@ class App {
     const url = getActiveRoute();
     const page = routes[url];
 
-    this.#content.innerHTML = await page.render();
+    const content = await page.render();
+    
+    if (typeof content === 'string') {
+      this.#content.innerHTML = content;
+    } else if (content instanceof Element) {
+      this.#content.innerHTML = '';
+      this.#content.appendChild(content);
+    }
+    
     await page.afterRender();
   }
 }

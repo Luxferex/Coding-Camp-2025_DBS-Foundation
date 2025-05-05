@@ -53,37 +53,39 @@ class LoginPage {
 
     loginForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-      
+
       const email = loginForm.email.value;
       const password = loginForm.password.value;
-      
+
       try {
         messageContainer.innerHTML = 'Sedang memproses...';
         messageContainer.className = 'message-container';
-        
+
         const response = await login({ email, password });
-        
+
         if (response.error) {
           messageContainer.innerHTML = response.message || 'Terjadi kesalahan saat login';
           messageContainer.className = 'message-container error-message';
           return;
         }
-        
+
         // Simpan token dan data user ke localStorage
         localStorage.setItem('token', response.loginResult.token);
-        localStorage.setItem('user', JSON.stringify({
-          id: response.loginResult.userId,
-          name: response.loginResult.name,
-        }));
-        
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            id: response.loginResult.userId,
+            name: response.loginResult.name,
+          })
+        );
+
         messageContainer.innerHTML = 'Login berhasil! Mengalihkan...';
         messageContainer.className = 'message-container success-message';
-        
+
         // Redirect ke halaman utama setelah login berhasil
         setTimeout(() => {
           window.location.hash = '#/';
         }, 1500);
-        
       } catch (error) {
         messageContainer.innerHTML = 'Terjadi kesalahan pada server';
         messageContainer.className = 'message-container error-message';
@@ -94,6 +96,10 @@ class LoginPage {
 
   render() {
     return this.loginContainer;
+  }
+
+  async afterRender() {
+    // Implementasi kosong jika tidak diperlukan
   }
 }
 
