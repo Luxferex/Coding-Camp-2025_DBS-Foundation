@@ -28,7 +28,7 @@ class App {
         if (link.contains(event.target)) {
           this.#navigationDrawer.classList.remove('open');
         }
-      })
+      });
     });
   }
 

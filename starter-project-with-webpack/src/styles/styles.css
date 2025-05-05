@@ -16,7 +16,7 @@ body {
 }
 
 header {
-  background-color: lightskyblue;
+  background-color: #213448;
 }
 
 .main-header {
@@ -33,7 +33,7 @@ header {
   font-size: 1.125rem;
   font-weight: bold;
   text-decoration: none;
-  color: #333;
+  color: #ecefca;
 }
 
 .navigation-drawer {
@@ -67,7 +67,7 @@ header {
 
   font-weight: bold;
   font-size: 28px;
-  color: #141e16;
+  color: #ecefca;
 
   cursor: pointer;
 }
@@ -84,7 +84,7 @@ header {
   padding: 6px 10px;
 
   display: block;
-  
+
   color: #333;
   text-decoration: none;
 }
@@ -96,6 +96,148 @@ header {
 /* MAIN */
 .main-content {
   padding-block: 20px;
+}
+
+/* Gaya untuk halaman Login dan Register */
+.login-container,
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #ecefca;
+  padding: 20px;
+}
+
+.login-card,
+.register-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(33, 52, 72, 0.1);
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+  transition: transform 0.3s ease;
+}
+
+.login-card:hover,
+.register-card:hover {
+  transform: translateY(-5px);
+}
+
+.login-header,
+.register-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-header h2,
+.register-header h2 {
+  color: #213448;
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.login-header p,
+.register-header p {
+  color: #547792;
+  font-size: 16px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  color: #213448;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-group input[type='text'],
+.form-group input[type='email'],
+.form-group input[type='password'] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #94b4c1;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #547792;
+  outline: none;
+}
+
+.password-toggle {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.password-toggle input {
+  margin-right: 8px;
+}
+
+.password-toggle label {
+  font-size: 14px;
+  margin-bottom: 0;
+  color: #547792;
+}
+
+.btn-login,
+.btn-register {
+  width: 100%;
+  padding: 14px;
+  background-color: #213448;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-login:hover,
+.btn-register:hover {
+  background-color: #547792;
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.form-footer a {
+  color: #547792;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.form-footer a:hover {
+  color: #213448;
+  text-decoration: underline;
+}
+
+.message-container {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #d32f2f;
+}
+
+.success-message {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #388e3c;
 }
 
 /* Write your styles more here */
@@ -125,5 +267,9 @@ header {
 
   .drawer-button {
     display: none;
+  }
+
+  .register-card {
+    max-width: 480px;
   }
 }
