@@ -63,48 +63,44 @@ class RegisterPage {
 
     registerForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-      
+
       const name = registerForm.name.value;
       const email = registerForm.email.value;
       const password = registerForm.password.value;
       const confirmPassword = registerForm.confirmPassword.value;
-      
-      // Validasi password
+
       if (password !== confirmPassword) {
         messageContainer.innerHTML = 'Password dan konfirmasi password tidak cocok';
         messageContainer.className = 'message-container error-message';
         return;
       }
-      
+
       if (password.length < 8) {
         messageContainer.innerHTML = 'Password harus minimal 8 karakter';
         messageContainer.className = 'message-container error-message';
         return;
       }
-      
+
       try {
         messageContainer.innerHTML = 'Sedang memproses...';
         messageContainer.className = 'message-container';
-        
+
         const response = await register({ name, email, password });
-        
+
         if (response.error) {
           messageContainer.innerHTML = response.message || 'Terjadi kesalahan saat mendaftar';
           messageContainer.className = 'message-container error-message';
           return;
         }
-        
+
         messageContainer.innerHTML = 'Pendaftaran berhasil! Silakan login.';
         messageContainer.className = 'message-container success-message';
-        
-        // Reset form setelah berhasil
+
         registerForm.reset();
-        
-        // Redirect ke halaman login setelah pendaftaran berhasil
+
         setTimeout(() => {
           window.location.hash = '#/login';
         }, 2000);
-        
       } catch (error) {
         messageContainer.innerHTML = 'Terjadi kesalahan pada server';
         messageContainer.className = 'message-container error-message';

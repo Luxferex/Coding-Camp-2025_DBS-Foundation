@@ -5,32 +5,30 @@ import App from './pages/app';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const app = new App({
-    content: document.querySelector('#main-content'),
-    drawerButton: document.querySelector('#drawer-button'),
-    navigationDrawer: document.querySelector('#navigation-drawer'),
+    navigationDrawer: document.getElementById('navigation-drawer'),
+    drawerButton: document.getElementById('drawer-button'),
+    content: document.getElementById('main-content'),
   });
-  
-  // Cek apakah pengguna sudah login (token tersimpan di localStorage)
-  const token = localStorage.getItem('token');
-  
-  // Jika belum login dan URL bukan ke halaman login atau register, redirect ke login
-  if (!token && window.location.hash !== '#/login' && window.location.hash !== '#/register') {
-    window.location.hash = '#/login';
-  }
-  
-  await app.renderPage();
 
-  window.addEventListener('hashchange', async () => {
-    // Cek lagi saat URL berubah
-    const currentToken = localStorage.getItem('token');
-    const isAuthPage = window.location.hash === '#/login' || window.location.hash === '#/register';
+  const checkAuth = () => {
+    const token = localStorage.getItem('token');
+    const hash = window.location.hash;
     
-    // Jika mencoba mengakses halaman selain login/register tanpa token, redirect ke login
-    if (!currentToken && !isAuthPage && window.location.hash !== '') {
+    // Redirect to login if trying to access protected routes without token
+    if (!token && (hash === '#/add-story')) {
       window.location.hash = '#/login';
       return;
     }
     
-    await app.renderPage();
-  });
+    // Redirect to home if already logged in but trying to access auth pages
+    if (token && (hash === '#/login' || hash === '#/register')) {
+      window.location.hash = '#/';
+      return;
+    }
+    
+    app.renderPage();
+  };
+
+  window.addEventListener('hashchange', checkAuth);
+  window.addEventListener('load', checkAuth);
 });

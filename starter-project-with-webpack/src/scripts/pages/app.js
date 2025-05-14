@@ -36,16 +36,32 @@ class App {
     const url = getActiveRoute();
     const page = routes[url];
 
-    const content = await page.render();
-    
-    if (typeof content === 'string') {
-      this.#content.innerHTML = content;
-    } else if (content instanceof Element) {
-      this.#content.innerHTML = '';
-      this.#content.appendChild(content);
+    if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      // Gunakan View Transition API
+      document.startViewTransition(async () => {
+        const content = await page.render();
+
+        if (typeof content === 'string') {
+          this.#content.innerHTML = content;
+        } else if (content instanceof Element) {
+          this.#content.innerHTML = '';
+          this.#content.appendChild(content);
+        }
+
+        await page.afterRender();
+      });
+    } else {
+      const content = await page.render();
+
+      if (typeof content === 'string') {
+        this.#content.innerHTML = content;
+      } else if (content instanceof Element) {
+        this.#content.innerHTML = '';
+        this.#content.appendChild(content);
+      }
+
+      await page.afterRender();
     }
-    
-    await page.afterRender();
   }
 }
 

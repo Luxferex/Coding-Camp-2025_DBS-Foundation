@@ -66,7 +66,12 @@ export async function getStoryDetail({ token, id }) {
 export async function addNewStory({ token, description, photo, lat, lon }) {
   const formData = new FormData();
   formData.append('description', description);
-  formData.append('photo', photo);
+
+  if (photo instanceof File) {
+    formData.append('photo', photo);
+  } else {
+    throw new Error('Photo should be a valid File object');
+  }
 
   if (lat) formData.append('lat', lat);
   if (lon) formData.append('lon', lon);

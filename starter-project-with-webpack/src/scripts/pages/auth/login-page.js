@@ -69,7 +69,6 @@ class LoginPage {
           return;
         }
 
-        // Simpan token dan data user ke localStorage
         localStorage.setItem('token', response.loginResult.token);
         localStorage.setItem(
           'user',
@@ -82,7 +81,6 @@ class LoginPage {
         messageContainer.innerHTML = 'Login berhasil! Mengalihkan...';
         messageContainer.className = 'message-container success-message';
 
-        // Redirect ke halaman utama setelah login berhasil
         setTimeout(() => {
           window.location.hash = '#/';
         }, 1500);
@@ -98,9 +96,7 @@ class LoginPage {
     return this.loginContainer;
   }
 
-  async afterRender() {
-    // Implementasi kosong jika tidak diperlukan
-  }
+  async afterRender() {}
 }
 
 export default LoginPage;
