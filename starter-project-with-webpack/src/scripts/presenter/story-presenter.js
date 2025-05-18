@@ -29,6 +29,27 @@ class StoryPresenter {
       this._view.hideLoading();
     }
   }
+  
+  async addStory({ description, photo, lat, lon }) {
+    try {
+      const response = await this._model.addStory({
+        token: this._token,
+        description,
+        photo,
+        lat,
+        lon,
+      });
+      
+      if (!response.error) {
+        this._view.showSuccess('Cerita berhasil ditambahkan!');
+      } else {
+        this._view.showError(`Error: ${response.message}`);
+      }
+    } catch (error) {
+      this._view.showError('Terjadi kesalahan saat mengirim cerita');
+      console.error(error);
+    }
+  }
 }
 
 export default StoryPresenter;

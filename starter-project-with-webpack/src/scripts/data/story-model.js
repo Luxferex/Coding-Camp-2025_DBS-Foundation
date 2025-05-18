@@ -1,4 +1,4 @@
-import { getAllStories } from './api';
+import { getAllStories, addNewStory } from './api';
 
 class StoryModel {
   constructor() {
@@ -8,7 +8,7 @@ class StoryModel {
   async getStories(token, page = 1, size = 10, location = 1) {
     try {
       const response = await getAllStories({ token, page, size, location });
-      
+
       if (!response.error) {
         this._stories = response.listStory || [];
         return {
@@ -16,7 +16,7 @@ class StoryModel {
           error: false,
         };
       }
-      
+
       return {
         stories: [],
         error: true,
@@ -27,6 +27,17 @@ class StoryModel {
         stories: [],
         error: true,
         message: 'Terjadi kesalahan saat mengambil data cerita',
+      };
+    }
+  }
+
+  async addStory({ token, description, photo, lat, lon }) {
+    try {
+      return await addNewStory({ token, description, photo, lat, lon });
+    } catch (error) {
+      return {
+        error: true,
+        message: 'Terjadi kesalahan saat menambahkan cerita',
       };
     }
   }

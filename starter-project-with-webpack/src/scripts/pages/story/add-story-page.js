@@ -1,4 +1,5 @@
-import { addNewStory } from '../../data/api';
+import StoryPresenter from '../../presenter/story-presenter';
+import StoryModel from '../../data/story-model';
 
 class AddStoryPage {
   constructor() {
@@ -8,6 +9,11 @@ class AddStoryPage {
     this._imageFile = null;
     this._map = null;
     this._marker = null;
+    this._storyModel = new StoryModel();
+    this._storyPresenter = new StoryPresenter({
+      view: this,
+      model: this._storyModel,
+    });
   }
 
   _initialUI() {
@@ -226,8 +232,7 @@ class AddStoryPage {
       event.preventDefault();
 
       if (!this._imageFile) {
-        messageContainer.innerHTML = 'Silakan pilih atau ambil foto terlebih dahulu';
-        messageContainer.className = 'message-container error';
+        this.showError('Silakan pilih atau ambil foto terlebih dahulu');
         return;
       }
 
@@ -240,47 +245,55 @@ class AddStoryPage {
       }
 
       try {
-        messageContainer.innerHTML = 'Sedang mengirim cerita...';
-        messageContainer.className = 'message-container';
+        this.showLoading('Sedang mengirim cerita...');
 
-        const response = await addNewStory({
-          token,
+        await this._storyPresenter.addStory({
           description,
           photo: this._imageFile,
           lat: this._latitude,
           lon: this._longitude,
         });
-
-        if (!response.error) {
-          messageContainer.innerHTML = 'Cerita berhasil ditambahkan!';
-          messageContainer.className = 'message-container success';
-
-          addStoryForm.reset();
-          document.getElementById('photoPreview').innerHTML = '<p>Belum ada foto yang dipilih</p>';
-          document.getElementById('locationCoordinates').innerHTML = '<p>Belum ada lokasi yang dipilih</p>';
-
-          if (this._marker) {
-            this._map.removeLayer(this._marker);
-            this._marker = null;
-          }
-
-          this._latitude = null;
-          this._longitude = null;
-          this._imageFile = null;
-
-          setTimeout(() => {
-            window.location.hash = '#/';
-          }, 2000);
-        } else {
-          messageContainer.innerHTML = `Error: ${response.message}`;
-          messageContainer.className = 'message-container error';
-        }
       } catch (error) {
-        messageContainer.innerHTML = 'Terjadi kesalahan saat mengirim cerita';
-        messageContainer.className = 'message-container error';
+        this.showError('Terjadi kesalahan saat mengirim cerita');
         console.error(error);
       }
     });
+  }
+
+  showLoading(message) {
+    const messageContainer = document.getElementById('addStoryMessage');
+    messageContainer.innerHTML = message || 'Sedang memproses...';
+    messageContainer.className = 'message-container';
+  }
+
+  showError(message) {
+    const messageContainer = document.getElementById('addStoryMessage');
+    messageContainer.innerHTML = message;
+    messageContainer.className = 'message-container error';
+  }
+
+  showSuccess(message) {
+    const messageContainer = document.getElementById('addStoryMessage');
+    messageContainer.innerHTML = message;
+    messageContainer.className = 'message-container success';
+
+    const addStoryForm = document.getElementById('addStoryForm');
+    addStoryForm.reset();
+    document.getElementById('photoPreview').innerHTML = '<p>Belum ada foto yang dipilih</p>';
+    document.getElementById('locationCoordinates').innerHTML = '<p>Belum ada lokasi yang dipilih</p>';
+
+    if (this._marker) {
+      this._map.removeLayer(this._marker);
+      this._marker = null;
+    }
+
+    this._latitude = null;
+    this._longitude = null;
+    this._imageFile = null;
+
+    setTimeout(() => {
+      window.location.hash = '#/';
+    }, 2000);
   }
 }
 
