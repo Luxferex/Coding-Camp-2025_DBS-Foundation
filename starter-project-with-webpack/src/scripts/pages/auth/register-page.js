@@ -1,7 +1,14 @@
-import { register } from '../../data/api';
+import RegisterModel from '../../data/register-model';
+import RegisterPresenter from '../../presenter/register-presenter';
 
 class RegisterPage {
   constructor() {
+    this._model = new RegisterModel();
+    this._presenter = new RegisterPresenter({
+      view: this,
+      model: this._model,
+    });
+    
     this._initialUI();
   }
 
@@ -54,7 +61,6 @@ class RegisterPage {
     const showPasswordCheckbox = this.registerContainer.querySelector('#showPassword');
     const passwordInput = this.registerContainer.querySelector('#password');
     const confirmPasswordInput = this.registerContainer.querySelector('#confirmPassword');
-    const messageContainer = this.registerContainer.querySelector('#registerMessage');
 
     showPasswordCheckbox.addEventListener('change', () => {
       passwordInput.type = showPasswordCheckbox.checked ? 'text' : 'password';
@@ -70,48 +76,45 @@ class RegisterPage {
       const confirmPassword = registerForm.confirmPassword.value;
 
       if (password !== confirmPassword) {
-        messageContainer.innerHTML = 'Password dan konfirmasi password tidak cocok';
-        messageContainer.className = 'message-container error-message';
+        this.showError('Password dan konfirmasi password tidak cocok');
         return;
       }
 
       if (password.length < 8) {
-        messageContainer.innerHTML = 'Password harus minimal 8 karakter';
-        messageContainer.className = 'message-container error-message';
+        this.showError('Password harus minimal 8 karakter');
         return;
       }
 
-      try {
-        messageContainer.innerHTML = 'Sedang memproses...';
-        messageContainer.className = 'message-container';
-
-        const response = await register({ name, email, password });
-
-        if (response.error) {
-          messageContainer.innerHTML = response.message || 'Terjadi kesalahan saat mendaftar';
-          messageContainer.className = 'message-container error-message';
-          return;
-        }
-
-        messageContainer.innerHTML = 'Pendaftaran berhasil! Silakan login.';
-        messageContainer.className = 'message-container success-message';
-
-        registerForm.reset();
-
-        setTimeout(() => {
-          window.location.hash = '#/login';
-        }, 2000);
-      } catch (error) {
-        messageContainer.innerHTML = 'Terjadi kesalahan pada server';
-        messageContainer.className = 'message-container error-message';
-        console.error(error);
-      }
+      await this._presenter.register({ name, email, password });
     });
+  }
+
+  showLoading() {
+    const messageContainer = this.registerContainer.querySelector('#registerMessage');
+    messageContainer.innerHTML = 'Sedang memproses...';
+    messageContainer.className = 'message-container';
+  }
+
+  showError(message) {
+    const messageContainer = this.registerContainer.querySelector('#registerMessage');
+    messageContainer.innerHTML = message;
+    messageContainer.className = 'message-container error-message';
+  }
+
+  showSuccess(message) {
+    const messageContainer = this.registerContainer.querySelector('#registerMessage');
+    messageContainer.innerHTML = message;
+    messageContainer.className = 'message-container success-message';
+    
+    const registerForm = this.registerContainer.querySelector('#registerForm');
+    registerForm.reset();
   }
 
   render() {
     return this.registerContainer;
   }
+
+  async afterRender() {}
 }
 
 export default RegisterPage;

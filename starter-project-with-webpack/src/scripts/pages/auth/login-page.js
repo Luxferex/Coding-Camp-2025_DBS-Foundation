@@ -1,7 +1,15 @@
 import { login } from '../../data/api';
+import LoginModel from '../../data/login-model';
+import LoginPresenter from '../../presenter/login-presenter';
 
 class LoginPage {
   constructor() {
+    this._model = new LoginModel();
+    this._presenter = new LoginPresenter({
+      view: this,
+      model: this._model,
+    });
+    
     this._initialUI();
   }
 
@@ -45,7 +53,6 @@ class LoginPage {
     const loginForm = this.loginContainer.querySelector('#loginForm');
     const showPasswordCheckbox = this.loginContainer.querySelector('#showPassword');
     const passwordInput = this.loginContainer.querySelector('#password');
-    const messageContainer = this.loginContainer.querySelector('#loginMessage');
 
     showPasswordCheckbox.addEventListener('change', () => {
       passwordInput.type = showPasswordCheckbox.checked ? 'text' : 'password';
@@ -57,39 +64,26 @@ class LoginPage {
       const email = loginForm.email.value;
       const password = loginForm.password.value;
 
-      try {
-        messageContainer.innerHTML = 'Sedang memproses...';
-        messageContainer.className = 'message-container';
-
-        const response = await login({ email, password });
-
-        if (response.error) {
-          messageContainer.innerHTML = response.message || 'Terjadi kesalahan saat login';
-          messageContainer.className = 'message-container error-message';
-          return;
-        }
-
-        localStorage.setItem('token', response.loginResult.token);
-        localStorage.setItem(
-          'user',
-          JSON.stringify({
-            id: response.loginResult.userId,
-            name: response.loginResult.name,
-          })
-        );
-
-        messageContainer.innerHTML = 'Login berhasil! Mengalihkan...';
-        messageContainer.className = 'message-container success-message';
-
-        setTimeout(() => {
-          window.location.hash = '#/';
-        }, 1500);
-      } catch (error) {
-        messageContainer.innerHTML = 'Terjadi kesalahan pada server';
-        messageContainer.className = 'message-container error-message';
-        console.error(error);
-      }
+      await this._presenter.login({ email, password });
     });
+  }
+
+  showLoading() {
+    const messageContainer = this.loginContainer.querySelector('#loginMessage');
+    messageContainer.innerHTML = 'Sedang memproses...';
+    messageContainer.className = 'message-container';
+  }
+
+  showError(message) {
+    const messageContainer = this.loginContainer.querySelector('#loginMessage');
+    messageContainer.innerHTML = message;
+    messageContainer.className = 'message-container error-message';
+  }
+
+  showSuccess(message) {
+    const messageContainer = this.loginContainer.querySelector('#loginMessage');
+    messageContainer.innerHTML = message;
+    messageContainer.className = 'message-container success-message';
   }
 
   render() {
