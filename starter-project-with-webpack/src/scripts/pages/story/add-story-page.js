@@ -9,6 +9,7 @@ class AddStoryPage {
     this._imageFile = null;
     this._map = null;
     this._marker = null;
+    this._stream = null;
     this._storyModel = new StoryModel();
     this._storyPresenter = new StoryPresenter({
       view: this,
@@ -129,11 +130,9 @@ class AddStoryPage {
     const photoCanvas = document.getElementById('photoCanvas');
     const photoPreview = document.getElementById('photoPreview');
 
-    let stream = null;
-
     startCameraButton.addEventListener('click', async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
+        this._stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: 'environment',
             width: { ideal: 1280 },
@@ -141,7 +140,7 @@ class AddStoryPage {
           },
         });
 
-        cameraPreview.srcObject = stream;
+        cameraPreview.srcObject = this._stream;
         cameraPreview.style.display = 'block';
         photoPreview.style.display = 'none';
         capturePhotoButton.disabled = false;
@@ -168,11 +167,7 @@ class AddStoryPage {
           photoPreview.style.display = 'block';
           cameraPreview.style.display = 'none';
 
-          if (stream) {
-            stream.getTracks().forEach((track) => track.stop());
-            stream = null;
-          }
-
+          this._stopCamera();
           capturePhotoButton.disabled = true;
         },
         'image/jpeg',
@@ -213,6 +208,25 @@ class AddStoryPage {
         capturePhotoButton.disabled = true;
       }
     });
+  }
+
+  // metode untuk mematikan kamera
+  _stopCamera() {
+    if (this._stream) {
+      this._stream.getTracks().forEach((track) => track.stop());
+      this._stream = null;
+    }
+  }
+
+  // metode dispose untuk membersihkan sumber daya
+  dispose() {
+    this._stopCamera();
+
+    // Bersihkan sumber daya map jika ada
+    if (this._map) {
+      this._map.remove();
+      this._map = null;
+    }
   }
 
   _initEventListeners() {

@@ -1,4 +1,3 @@
-import { login } from '../../data/api';
 import LoginModel from '../../data/login-model';
 import LoginPresenter from '../../presenter/login-presenter';
 
@@ -9,7 +8,7 @@ class LoginPage {
       view: this,
       model: this._model,
     });
-    
+
     this._initialUI();
   }
 

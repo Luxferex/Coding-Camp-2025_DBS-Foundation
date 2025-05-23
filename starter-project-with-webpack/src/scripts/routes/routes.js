@@ -5,11 +5,11 @@ import LoginPage from '../pages/auth/login-page';
 import AddStoryPage from '../pages/story/add-story-page';
 
 const routes = {
-  '/': new HomePage(),
-  '/about': new AboutPage(),
-  '/register': new RegisterPage(),
-  '/login': new LoginPage(),
-  '/add-story': new AddStoryPage(),
+  '/': () => new HomePage(),
+  '/about': () => new AboutPage(),
+  '/register': () => new RegisterPage(),
+  '/login': () => new LoginPage(),
+  '/add-story': () => new AddStoryPage(),
 };
 
 export default routes;

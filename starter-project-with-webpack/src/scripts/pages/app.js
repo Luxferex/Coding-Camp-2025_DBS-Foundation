@@ -5,6 +5,7 @@ class App {
   #content = null;
   #drawerButton = null;
   #navigationDrawer = null;
+  #currentPage = null;
 
   constructor({ navigationDrawer, drawerButton, content }) {
     this.#content = content;
@@ -34,10 +35,16 @@ class App {
 
   async renderPage() {
     const url = getActiveRoute();
-    const page = routes[url];
+    const pageBuilder = routes[url];
+    const page = pageBuilder();
+
+    if (this.#currentPage && typeof this.#currentPage.dispose === 'function') {
+      this.#currentPage.dispose();
+    }
+
+    this.#currentPage = page;
 
     if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      // Gunakan View Transition API
       document.startViewTransition(async () => {
         const content = await page.render();
 
