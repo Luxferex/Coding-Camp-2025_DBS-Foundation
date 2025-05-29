@@ -1,0 +1,25 @@
+{
+  "name": "belajar-backend-pemula-dengan-java-script",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "nanoid": "^3.3.11"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.31.0",
+    "globals": "^16.2.0"
+  }
+}
