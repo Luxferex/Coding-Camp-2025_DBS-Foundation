@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { nanoid } = require('nanoid');
+
 const app = express();
 const port = 9000;
 
@@ -8,7 +9,7 @@ const port = 9000;
 app.use(bodyParser.json());
 
 // Array untuk menyimpan data buku
-let books = [];
+const books = [];
 
 // Kriteria 3: Menyimpan Buku (POST /books)
 app.post('/books', (req, res) => {
@@ -61,7 +62,7 @@ app.post('/books', (req, res) => {
 
 // Kriteria 4: Menampilkan Seluruh Buku (GET /books)
 app.get('/books', (req, res) => {
-  let { name, reading, finished } = req.query;
+  const { name, reading, finished } = req.query;
 
   let filteredBooks = books;
 
