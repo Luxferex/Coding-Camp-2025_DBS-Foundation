@@ -92,11 +92,17 @@ server.route({
       filteredBooks = filteredBooks.filter((book) => book.finished === finishedStatus);
     }
 
+    const simplifiedBooks = filteredBooks.map((book) => ({
+      id: book.id,
+      name: book.name,
+      publisher: book.publisher,
+    }));
+
     return h
       .response({
         status: 'success',
         data: {
-          books: filteredBooks,
+          books: simplifiedBooks,
         },
       })
       .code(200);
