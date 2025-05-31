@@ -1,12 +1,15 @@
 import StoryModel from '../../data/story-model';
 import StoryPresenter from '../../presenter/story-presenter';
+import AuthModel from '../../data/auth-model';
 
 export default class HomePage {
   constructor() {
     this._storyModel = new StoryModel();
+    this._authModel = new AuthModel();
     this._storyPresenter = new StoryPresenter({
       view: this,
       model: this._storyModel,
+      authModel: this._authModel,
     });
 
     this._stories = [];

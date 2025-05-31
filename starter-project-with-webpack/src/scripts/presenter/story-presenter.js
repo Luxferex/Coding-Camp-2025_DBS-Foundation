@@ -1,16 +1,16 @@
 class StoryPresenter {
-  constructor({ view, model }) {
+  constructor({ view, model, authModel }) {
     this._view = view;
     this._model = model;
-    
-    this._token = localStorage.getItem('token');
+    this._authModel = authModel;
   }
   
   async getAllStories() {
     this._view.showLoading();
     
     try {
-      const { stories, error, message } = await this._model.getStories(this._token);
+      const token = this._authModel.getToken();
+      const { stories, error, message } = await this._model.getStories(token);
       
       if (error) {
         this._view.showError(message);
@@ -32,8 +32,9 @@ class StoryPresenter {
   
   async addStory({ description, photo, lat, lon }) {
     try {
+      const token = this._authModel.getToken();
       const response = await this._model.addStory({
-        token: this._token,
+        token,
         description,
         photo,
         lat,

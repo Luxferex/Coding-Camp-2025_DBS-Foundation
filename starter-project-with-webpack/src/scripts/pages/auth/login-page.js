@@ -89,6 +89,10 @@ class LoginPage {
     return this.loginContainer;
   }
 
+  navigateTo(path) {
+    window.location.hash = `#${path}`;
+  }
+
   async afterRender() {}
 }
 

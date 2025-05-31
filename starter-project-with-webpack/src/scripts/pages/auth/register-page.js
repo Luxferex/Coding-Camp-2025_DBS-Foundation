@@ -114,6 +114,10 @@ class RegisterPage {
     return this.registerContainer;
   }
 
+  navigateTo(path) {
+    window.location.hash = `#${path}`;
+  }
+
   async afterRender() {}
 }
 

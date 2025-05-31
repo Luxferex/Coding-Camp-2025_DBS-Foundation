@@ -1,5 +1,3 @@
-import CONFIG from '../config';
-
 const ENDPOINTS = {
   BASE_URL: 'https://story-api.dicoding.dev/v1',
   REGISTER: '/register',
