@@ -37,7 +37,7 @@ export default class StoryDetailPage {
 
     try {
       const token = this._authModel.getToken();
-      const response = await this._fetchStoryDetail(token, storyId);
+      const response = await this._storyModel.getStoryDetail(token, storyId);
 
       if (response.error) {
         this._showError(response.message || 'Gagal memuat detail cerita');
@@ -51,22 +51,6 @@ export default class StoryDetailPage {
       console.error(error);
     } finally {
       this._hideLoading();
-    }
-  }
-
-  async _fetchStoryDetail(token, id) {
-    try {
-      const response = await fetch(`https://story-api.dicoding.dev/v1/stories/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return await response.json();
-    } catch (error) {
-      return {
-        error: true,
-        message: 'Terjadi kesalahan saat mengambil detail cerita',
-      };
     }
   }
 

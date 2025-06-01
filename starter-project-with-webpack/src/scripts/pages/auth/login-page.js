@@ -1,12 +1,15 @@
 import LoginModel from '../../data/login-model';
 import LoginPresenter from '../../presenter/login-presenter';
+import AuthModel from '../../data/auth-model';
 
 class LoginPage {
   constructor() {
     this._model = new LoginModel();
+    this._authModel = new AuthModel();
     this._presenter = new LoginPresenter({
       view: this,
       model: this._model,
+      authModel: this._authModel,
     });
 
     this._initialUI();

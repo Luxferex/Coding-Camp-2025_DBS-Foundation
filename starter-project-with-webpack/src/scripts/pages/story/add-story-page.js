@@ -1,5 +1,6 @@
 import StoryPresenter from '../../presenter/story-presenter';
 import StoryModel from '../../data/story-model';
+import AuthModel from '../../data/auth-model';
 
 class AddStoryPage {
   constructor() {
@@ -11,9 +12,11 @@ class AddStoryPage {
     this._marker = null;
     this._stream = null;
     this._storyModel = new StoryModel();
+    this._authModel = new AuthModel();
     this._storyPresenter = new StoryPresenter({
       view: this,
       model: this._storyModel,
+      authModel: this._authModel,
     });
   }
 
@@ -251,7 +254,7 @@ class AddStoryPage {
       }
 
       const description = addStoryForm.description.value;
-      const token = localStorage.getItem('token');
+      const token = this._authModel.getToken();
 
       if (!token) {
         window.location.hash = '#/login';

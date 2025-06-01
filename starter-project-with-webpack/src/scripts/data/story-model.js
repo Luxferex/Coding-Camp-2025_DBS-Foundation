@@ -1,4 +1,4 @@
-import { getAllStories, addNewStory } from './api';
+import { getAllStories, addNewStory, getStoryDetail } from './api';
 
 class StoryModel {
   constructor() {
@@ -38,6 +38,17 @@ class StoryModel {
       return {
         error: true,
         message: 'Terjadi kesalahan saat menambahkan cerita',
+      };
+    }
+  }
+  
+  async getStoryDetail(token, id) {
+    try {
+      return await getStoryDetail({ token, id });
+    } catch (error) {
+      return {
+        error: true,
+        message: 'Terjadi kesalahan saat mengambil detail cerita',
       };
     }
   }
