@@ -1,7 +1,9 @@
-// CSS imports
 import '../styles/styles.css';
+import * as idb from 'idb';
+window.idb = idb;
 
 import App from './pages/app';
+import { subscribeNotification } from './data/api';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const app = new App({
@@ -13,22 +15,85 @@ document.addEventListener('DOMContentLoaded', async () => {
   const checkAuth = () => {
     const token = localStorage.getItem('token');
     const hash = window.location.hash;
-    
-    // Redirect to login if trying to access protected routes without token
-    if (!token && (hash === '#/add-story')) {
+
+    if (!token && hash === '#/add-story') {
       window.location.hash = '#/login';
       return;
     }
-    
-    // Redirect to home if already logged in but trying to access auth pages
+
     if (token && (hash === '#/login' || hash === '#/register')) {
       window.location.hash = '#/';
       return;
     }
-    
+
     app.renderPage();
   };
 
   window.addEventListener('hashchange', checkAuth);
   window.addEventListener('load', checkAuth);
 });
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('Service Worker terdaftar:', registration);
+
+      // Jika PushManager tersedia, lakukan subscribe
+      if ('PushManager' in window) {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          subscribeUserToPush(registration);
+        }
+      }
+    } catch (error) {
+      console.error('Service Worker gagal didaftarkan:', error);
+    }
+  });
+}
+
+async function subscribeUserToPush(registration) {
+  const vapidPublicKey = 'BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk';
+  const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+  try {
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: convertedVapidKey,
+    });
+
+    // Dapatkan token dari localStorage
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      // Ekstrak endpoint dan keys dari subscription
+      const { endpoint } = subscription;
+      const keys = {
+        p256dh: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('p256dh')))),
+        auth: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('auth')))),
+      };
+
+      // Kirim subscription ke server menggunakan API
+      const result = await subscribeNotification({ token, endpoint, keys });
+      console.log('Push Subscription berhasil dikirim ke server:', result);
+    } else {
+      console.log('User belum login, subscription tidak dikirim ke server');
+      console.log('Push Subscription:', JSON.stringify(subscription));
+    }
+  } catch (error) {
+    console.error('Gagal subscribe push:', error);
+  }
+}
+
+// Helper untuk konversi VAPID key
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
