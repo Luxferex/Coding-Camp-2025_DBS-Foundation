@@ -34,10 +34,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Register service worker
+// Tambahkan import ini di bagian atas file
+import { Workbox } from 'workbox-window';
+
+// Ganti kode registrasi service worker yang ada dengan ini
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
+      const wb = new Workbox('/sw.js');
+      
+      wb.addEventListener('installed', (event) => {
+        if (event.isUpdate) {
+          console.log('Service worker telah diperbarui');
+          if (confirm('Aplikasi telah diperbarui. Muat ulang halaman untuk menggunakan versi terbaru?')) {
+            window.location.reload();
+          }
+        } else {
+          console.log('Service worker berhasil diinstal');
+        }
+      });
+
+      wb.addEventListener('activated', (event) => {
+        if (event.isUpdate) {
+          console.log('Service worker telah diaktifkan setelah pembaruan');
+        }
+      });
+
+      const registration = await wb.register();
       console.log('Service Worker terdaftar:', registration);
 
       // Jika PushManager tersedia, lakukan subscribe
@@ -53,6 +76,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// Fungsi subscribeUserToPush tetap sama seperti sebelumnya
 async function subscribeUserToPush(registration) {
   const vapidPublicKey = 'BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk';
   const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
