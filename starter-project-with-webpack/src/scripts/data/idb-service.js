@@ -1,3 +1,5 @@
+import * as idb from 'idb';
+
 const DATABASE_NAME = 'dicoding-story-db';
 const DATABASE_VERSION = 1;
 const OBJECT_STORE_NAME = 'stories';
@@ -21,11 +23,11 @@ const IdbService = {
     const db = await dbPromise;
     const tx = db.transaction(OBJECT_STORE_NAME, 'readwrite');
     const store = tx.objectStore(OBJECT_STORE_NAME);
-    
+
     stories.forEach((story) => {
       store.put(story);
     });
-    
+
     return tx.complete;
   },
 

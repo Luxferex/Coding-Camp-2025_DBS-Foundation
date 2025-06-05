@@ -51,52 +51,8 @@ self.addEventListener('activate', (event) => {
 
 // Event fetch - strategi Cache First, kemudian Network
 self.addEventListener('fetch', (event) => {
-  // Skip permintaan yang tidak menggunakan http(s)
   if (!event.request.url.startsWith('http')) return;
 
-  // Skip permintaan API
-  if (event.request.url.includes('/v1/')) return;
-
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Cache hit - return response dari cache
-      if (response) {
-        return response;
-      }
-
-      // Buat clone dari request
-      const fetchRequest = event.request.clone();
-
-      return fetch(fetchRequest)
-        .then((response) => {
-          // Periksa apakah response valid
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-
-          // Buat clone dari response
-          const responseToCache = response.clone();
-
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-
-          return response;
-        })
-        .catch(() => {
-          if (event.request.headers.get('accept').includes('text/html')) {
-            return caches.match('/index.html');
-          }
-        });
-    })
-  );
-});
-
-// Event fetch - strategi Cache First, kemudian Network
-self.addEventListener('fetch', (event) => {
-  if (!event.request.url.startsWith('http')) return;
-
-  // Jangan cache permintaan API
   if (event.request.url.includes('/v1/')) {
     event.respondWith(
       fetch(event.request).catch(() => {
