@@ -1,0 +1,46 @@
+{
+  "name": "Dicoding Story",
+  "short_name": "DStory",
+  "description": "Aplikasi berbagi cerita dari Dicoding",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2196f3",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tambah Cerita Baru",
+      "short_name": "Tambah Cerita",
+      "description": "Tambahkan cerita baru ke Dicoding Story",
+      "url": "/#/add-story",
+      "icons": [{ "src": "images/logo.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "images/screenshot-desktop.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "images/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+}

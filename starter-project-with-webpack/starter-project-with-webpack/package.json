@@ -2,7 +2,7 @@
   "name": "app-starter-project-with-webpack",
   "version": "1.0.0",
   "description": "",
-  "homepage": "https://Luxferex.github.io/dicoding-story-app",
+  "homepage": "https://Luxferex/app-starter-project-with-webpack",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "start-dev": "webpack serve --config webpack.dev.js",
